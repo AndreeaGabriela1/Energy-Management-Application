@@ -1,0 +1,35 @@
+<div class="devices-container">
+  <div *ngFor="let device of devices" class="device-entry">
+    <p><strong>Device ID:</strong> {{ device.id }}</p>
+    <p><strong>User Email:</strong> {{ device.userEmail }}</p>
+    <p><strong>Description:</strong> {{ device.description }}</p>
+    <p><strong>Address:</strong> {{ device.address }}</p>
+    <p><strong>Maximum Hourly Energy Consumption:</strong> {{ device.maximumConsumption }} kWh</p>
+
+    <!-- Buton pentru editare -->
+    <button (click)="editDevice(device)">Edit</button>
+
+    <!-- Formular de editare -->
+    <div *ngIf="device.isEditing" class="edit-form">
+      <form (ngSubmit)="updateDevice(device)">
+        <select [(ngModel)]="selectedUser" name="userEmail" required>
+          <option *ngFor="let user of users" [value]="user.email">{{ user.email }}</option>
+        </select>
+
+        <input type="text" [(ngModel)]="device.description" name="description" placeholder="Description" required />
+        <input type="text" [(ngModel)]="device.address" name="address" placeholder="Address" required />
+        <input type="number" [(ngModel)]="device.maximumConsumption" name="maximumConsumption" placeholder="Maximum Consumption" required />
+        <div class="form-actions">
+          <button type="submit" class="btn btn-success">Save</button>
+          <button type="button" (click)="cancelEdit(device)" class="btn btn-secondary">Cancel</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Buton pentru ștergere -->
+    <button (click)="deleteDevice(device.id)" class="btn btn-danger">Delete</button>
+    <div *ngIf="showChart"> <!--div *ngIf="device.id" -->
+      <button (click)="showDeviceChart(device.id, device.maximumConsumption)">Show chart</button>
+    </div>
+  </div>
+</div>

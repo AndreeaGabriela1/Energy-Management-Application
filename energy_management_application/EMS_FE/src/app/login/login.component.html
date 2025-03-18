@@ -1,0 +1,16 @@
+<div class="content card highlight-card card-small " role="main">
+  <h2>Welcome to Energy Management Sysytem!</h2>
+</div>
+<form class="container" (ngSubmit)="onSubmit()">
+  <label for="username">Email:</label>
+  <input type="text" id="username" name="username" [(ngModel)]="user.email" required>
+  
+  <label for="password">Password:</label>
+  <input type="password" id="password" name="password" [(ngModel)]="user.password" required>
+  
+  <button type="submit" (click)="userLogin()">Login</button>
+  <div class="signup-link">
+    Don't have an account? Contact an admin! <!-- <a href="/signin">Sign up</a> -->
+  </div>
+</form>
+  

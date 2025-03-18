@@ -1,0 +1,7 @@
+FROM dockerfile/java:oracle-java8
+
+VOLUME /tmp
+ADD monitoring.jar /opt/monitoring/
+EXPOSE 8080
+WORKDIR /opt/monitoring/
+CMD ["java", "-Djava.security.egd=file:/dev/./urandom", "-Xms512m", "-Xmx1g", "-jar", "monitoring.jar"]

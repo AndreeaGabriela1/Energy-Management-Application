@@ -1,0 +1,26 @@
+<div>
+  <label for="datePicker">Select a date:</label>
+  <input
+    id="datePicker"
+    type="date"
+    [(ngModel)]="selectedDate"
+    (change)="onDateChange()"
+  />
+</div>
+
+<div>
+  <button (click)="fetchDataForSelectedDate()">Fetch Data</button>
+</div>
+
+<div style="display: block;">
+    <canvas baseChart
+            [datasets]="barChartData"
+            [labels]="barChartLabels"
+            [options]="barChartOptions"
+            [type]="barChartType"
+            [legend]="true"
+            [height]="400"
+            [width]="600">
+    </canvas>
+</div>
+

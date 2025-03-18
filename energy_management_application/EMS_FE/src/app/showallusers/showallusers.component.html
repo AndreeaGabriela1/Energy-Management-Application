@@ -1,0 +1,90 @@
+<div class="users-container">
+    <div *ngFor="let user of users" class="users-entry">
+        <p>
+            <strong>
+                Name:
+                <div *ngIf="!editUser || selectedUser !== user" style="display: inline;">
+                    {{ user.name }}
+                </div>
+                <input *ngIf="editUser && selectedUser === user" [(ngModel)]="user.name">
+            </strong>
+        </p>
+      <p>
+        <strong>
+          Email:
+          <div *ngIf="!editUser || selectedUser !== user" style="display: inline;">
+            {{ user.email }}
+          </div>
+          <input *ngIf="editUser && selectedUser === user" [(ngModel)]="user.email" type="email"> <!-- Input pentru editare email -->
+        </strong>
+      </p>
+        <p>
+            <strong>
+                Role : {{ user.roles ? getRole(user.roles) : 'N/A' }}
+            </strong>
+        </p>
+        <p>
+          <strong>
+            Password:
+            <div *ngIf="!editUser || selectedUser !== user" style="display: inline;">
+              {{ user.password }} <!-- Afișează parola -->
+            </div>
+            <input *ngIf="editUser && selectedUser === user" [(ngModel)]="user.password" type="password"> <!-- Câmp pentru editare -->
+          </strong>
+        </p>
+        <button class="button-view" (click)="viewUserDevices(user); selectUser(user)"><i
+                class="fas fa-eye"></i></button>
+        <button class="button-modify" (click)="modifyUser(user)"><i class="fas fa-edit"></i></button>
+        <button class="button-save" (click)="saveUserChanges(user)" *ngIf="editUser && selectedUser === user">Save</button>
+        <button class="button-delete" (click)="deleteUser(user)"><i class="fas fa-trash-alt"></i></button>
+
+        <div class="devices-container" *ngIf="selectedUser === user && showDevicesContainer">
+            <div *ngFor="let device of devices" class="device-entry">
+                <div *ngIf="device.userEmail === user.email">
+                    <div class="row">
+                        <div>
+                            <p><strong>
+                                    Device id: {{ device.id }}
+                                </strong>
+                            </p>
+                            <p>
+                                <strong>
+                                    Description:
+                                        <div *ngIf="!editDevice || selectedDevice !== device" style="display: inline;">
+                                            {{ device.description }}
+                                        </div>
+                                        <input *ngIf="editDevice && selectedDevice === device" [(ngModel)]="device.description">
+                                </strong>
+                            </p>
+                            <p>
+                                <strong>
+                                    Address:
+                                        <div *ngIf="!editDevice || selectedDevice !== device" style="display: inline;">
+                                            {{ device.address }}
+                                        </div>
+                                        <input *ngIf="editDevice && selectedDevice === device" [(ngModel)]="device.address">
+                                </strong>
+                            </p>
+                            <p>
+                                <strong>
+                                    Maximum hourly energy consumption:
+                                    <div *ngIf="!editDevice || selectedDevice !== device" style="display: inline;">
+                                        {{ device.maximumConsumption }} kWh
+                                    </div>
+                                    <input *ngIf="editDevice && selectedDevice === device" [(ngModel)]="device.maximumConsumption">
+                                </strong>
+                            </p>
+                        </div>
+                        <div class="button-column">
+                            <button class="button-modify-device" (click)="modifyDevice(device)"><i
+                                    class="fas fa-edit"></i></button>
+                            <button (click)="saveDeviceChanges(device)" *ngIf="editDevice && selectedDevice === device">Save</button>
+                            <button class="button-delete-device" (click)="deleteDevice(device)"><i
+                                    class="fas fa-trash-alt"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

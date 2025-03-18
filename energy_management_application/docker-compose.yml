@@ -1,0 +1,260 @@
+#version: '3'
+
+services:
+  postgres1:
+    image: postgres
+    container_name: postgres1
+    environment:
+      POSTGRES_DB: 'user-db1'
+      POSTGRES_USER: 'postgres'
+      POSTGRES_PASSWORD: 'admin'
+    ports:
+      - "5434:5433"
+    volumes:
+      - pg-db1:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - ems_network
+
+  postgres2:
+    image: postgres
+    container_name: postgres2
+    environment:
+      POSTGRES_DB: 'device-db1'
+      POSTGRES_USER: 'postgres'
+      POSTGRES_PASSWORD: 'admin'
+    ports:
+      - "5437:5433"
+    volumes:
+      - pg-db2:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - ems_network
+
+  postgres3:
+    image: postgres
+    container_name: postgres3
+    environment:
+      POSTGRES_DB: 'monitoring-db1'
+      POSTGRES_USER: 'postgres'
+      POSTGRES_PASSWORD: 'admin'
+    ports:
+      - "5436:5433"
+    volumes:
+      - pg-db3:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - ems_network
+
+  rabbitmq:
+    image: rabbitmq:management
+    container_name: rabbitmq
+    environment:
+      #RABBITMQ_DEFAULT_HOST: localhost
+      #hostname: rabbitmq
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+    healthcheck:
+      test: [ "CMD", "rabbitmqctl", "status" ]
+      #test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - ems_network
+
+  users:
+    image: user-image
+    #container_name: users-container
+    depends_on:
+      - postgres1
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres1:5432/user-db
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: admin
+    ports:
+      - "8090"
+#      - "8090:8090"
+    deploy:
+      replicas: 2  #pentru partea de load balancing
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.users.rule=Host(`users.localhost`)"
+      - "traefik.http.routers.users.entrypoints=web"
+      - "traefik.http.services.users.loadbalancer.server.port=8090"
+#      - "traefik.http.middlewares.cors.headers.accesscontrolalloworiginlist=http://localhost:4200,http://users.localhost"
+#      - "traefik.http.middlewares.cors.headers.accesscontrolallowmethods=GET,POST,PUT,DELETE,OPTIONS"
+#      - "traefik.http.middlewares.cors.headers.accesscontrolallowheaders=Content-Type,Authorization"
+#      - "traefik.http.middlewares.cors.headers.accesscontrolallowcredentials=true"
+#      - "traefik.http.routers.users.middlewares=cors"
+    networks:
+      - ems_network
+
+  devices:
+    image: device-image
+    #container_name: devices-container
+    depends_on:
+      - postgres2
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres2:5432/device-db
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: admin
+#    ports:
+#      - "8081:8081"
+##      - "8081"
+    deploy:
+      replicas: 2  #pentru partea de load balancing
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.devices.rule=Host(`devices.localhost`)"
+      - "traefik.http.services.devices.loadbalancer.server.port=8081"
+#      - "traefik.http.routers.devices.entrypoints=web"
+    networks:
+      - ems_network
+
+  monitoring:
+    image: monitoring-image
+    #container_name: monitoring-container
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      postgres3:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres3:5432/monitoring-db
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: admin
+      SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_RABBITMQ_PORT: 5672
+      SPRING_RABBITMQ_USERNAME: guest
+      SPRING_RABBITMQ_PASSWORD: guest
+    #      SPRING_RABBITMQ_HOST: localhost
+    #      SPRING_RABBITMQ_PORT: 5672
+    #      SPRING_RABBITMQ_USERNAME: guest
+    #      SPRING_RABBITMQ_PASSWORD: guest
+#    ports:
+#      - "8085:8085"
+##      - "8085"
+    deploy:
+      replicas: 1  #pentru partea de load balancing
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.monitoring.rule=Host(`monitoring.localhost`)"
+      - "traefik.http.services.monitoring.loadbalancer.server.port=8085"
+#      - "traefik.http.routers.monitoring.entrypoints=web"
+    networks:
+      - ems_network
+
+  simulator:
+    image: simulator-image
+    build:
+      context: ../device-simulator
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    environment:
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_PORT: 5673
+      RABBITMQ_USERNAME: guest
+      RABBITMQ_PASSWORD: guest
+    #      CSV_FILE_PATH: /data/sensor.csv
+    volumes:
+      - D:/Facultate/AC-CTI/CTI/TI anul IV/sem 1/SD/Laborator/device-simulator/sensor.csv:/data/sensor.csv
+      - D:/Facultate/AC-CTI/CTI/TI anul IV/sem 1/SD/Laborator/device-simulator/id_device.txt:/data/id_device.txt
+    networks:
+      - ems_network
+
+#  simulator2:
+#    image: simulator2-image
+#    build:
+#      context: ../device-simulator2
+#    depends_on:
+#      rabbitmq:
+#        condition: service_healthy
+#    environment:
+#      RABBITMQ_HOST: rabbitmq
+#      RABBITMQ_PORT: 5673
+#      RABBITMQ_USERNAME: guest
+#      RABBITMQ_PASSWORD: guest
+#    #      CSV_FILE_PATH: /data/sensor.csv
+#    volumes:
+#      - D:/Facultate/AC-CTI/CTI/TI anul IV/sem 1/SD/Laborator/device-simulator2/sensor.csv:/data/sensor.csv
+#      - D:/Facultate/AC-CTI/CTI/TI anul IV/sem 1/SD/Laborator/device-simulator2/id_device.txt:/data/id_device.txt
+#    networks:
+#      - ems_network
+
+  chat:
+    image: chat-image
+    #container_name: chat-container
+    networks:
+      - ems_network
+#    ports:
+#      - "8095:8095"
+    deploy:
+      replicas: 1  #pentru partea de load balancing
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.chat.rule=Host(`chat.localhost`)"
+      - "traefik.http.services.chat.loadbalancer.server.port=8095"
+#      - "traefik.http.routers.chat.entrypoints=web"
+
+  fe:
+    image: fe-image
+    container_name: fe-service
+    ports:
+      - "4200:4200"
+    depends_on:
+      users:
+        condition: service_started
+      devices:
+        condition: service_started
+      monitoring:
+        condition: service_started
+    networks:
+      - ems_network
+
+  traefik:
+    image: traefik:v3.2
+    command:
+      - --api.insecure=true
+#      - --api.dashboard=true
+      - --providers.docker
+      - --accesslog=true
+      - --accesslog.filepath=/var/log/traefik/access.log
+      - --log.level=DEBUG
+      - --entrypoints.web.address=:80
+    ports:
+      - "8086:80"
+      - "8080:8080" # Dashboard Traefik
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    networks:
+      - ems_network
+
+
+# Definirea volumelor
+volumes:
+  pg-db1:
+  pg-db2:
+  pg-db3:
+  traefik_logs:
+
+# Definirea rețelei
+networks:
+  ems_network:
+    driver: bridge

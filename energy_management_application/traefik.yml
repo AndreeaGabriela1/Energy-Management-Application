@@ -1,0 +1,28 @@
+api:
+  insecure: true
+  dashboard: true
+
+entryPoints:
+  web:
+    address: ":80"
+
+providers:
+  docker:
+    exposedByDefault: false
+
+http:
+  middlewares:
+    cors:
+      headers:
+        accessControlAllowOriginList: ["http://localhost:4200", "http://users.localhost"]
+        accessControlAllowMethods:
+          - "GET"
+          - "POST"
+          - "PUT"
+          - "DELETE"
+          - "OPTIONS"
+        accessControlAllowHeaders:
+          - "Authorization"
+          - "Content-Type"
+        accessControlAllowCredentials: true
+        addVaryHeader: true

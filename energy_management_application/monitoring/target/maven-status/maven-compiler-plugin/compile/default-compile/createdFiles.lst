@@ -1,0 +1,15 @@
+org\application\monitoring\config\RabbitMQConfig.class
+org\application\monitoring\entities\Measurement.class
+org\application\monitoring\security\SecurityConfig.class
+org\application\monitoring\consumer\RabbitMQJsonConsumer.class
+org\application\monitoring\dtos\request\MonitoringRequest.class
+org\application\monitoring\controllers\MonitoringController.class
+org\application\monitoring\repositories\MeasurementRepository.class
+org\application\monitoring\security\AuthEntryPointJwt.class
+org\application\monitoring\consumer\RabbitMQConsumer.class
+org\application\monitoring\dtos\MeasurementDifference.class
+org\application\monitoring\MonitoringApplication.class
+org\application\monitoring\services\MeasurementServiceImpl.class
+org\application\monitoring\security\JwtUtils.class
+org\application\monitoring\services\MeasurementService.class
+org\application\monitoring\dtos\MeasurementDto.class

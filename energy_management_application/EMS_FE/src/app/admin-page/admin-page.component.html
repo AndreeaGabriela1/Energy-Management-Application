@@ -1,0 +1,60 @@
+<div class="row">
+    <div class="left">
+        <div class="left">
+            <form (ngSubmit)="onSubmit()" class="form rectangle">
+                <h2>Add Devices</h2>
+                <div class="form-group">
+                    <label for="device">Device Description: </label>
+                    <input type="text" class="form-control" id="description" name="description" [(ngModel)]="description" required>
+                </div>
+                <div class="form-group">
+                    <label for="address">Adress: </label>
+                    <input type="text" class="form-control" id="address" name="address" [(ngModel)]="address">
+                </div>
+                <div class="form-group">
+                    <label for="max-consumption">Maximum hourly energy consumption: </label>
+                    <input type="number" class="form-control" id="max-consumption" name="max-consumption" [(ngModel)]="maxConsumption">
+                </div>
+              <div class="form-group">
+                <label for="user-select">Select User: </label>
+                <select class="form-control" id="user-select" name="user-select" [(ngModel)]="selectedUser">
+                  <option *ngFor="let user of users" [value]="user.email">{{ user.email }}</option>
+                </select>
+              </div>
+                <div class="form-group justify-content: center;">
+                    <h3>Add Users</h3>
+                </div>
+                <div class="form-group">
+                    <label for="user-name">Name</label>
+                    <input type="string" class="form-control" id="user-name" name="user-name" [(ngModel)]="userName">
+                </div>
+                <div class="form-group">
+                    <label for="user-email">Email</label>
+                    <input type="string" class="form-control" id="user-email" name="user-email" [(ngModel)]="userEmail">
+                </div>
+                <div class="form-group">
+                    <label for="user-password">Password</label>
+                    <input type="password" class="form-control" id="user-password" name="user-password" [(ngModel)]="userPassword">
+                </div>
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
+        </div>
+        <div>
+            <button class="button" (click)="showAllUsers()">Show All Users</button>
+
+            <app-showallusers *ngIf="showAllUsersComponent"></app-showallusers>
+        </div>
+        <div>
+          <button class="button" (click)="showAllDevices()">Show All Devices</button>
+          <app-showalldevices *ngIf="showAllDevicesComponent" [showAllDevices]="true"></app-showalldevices>
+        </div>
+      <div>
+        <button class="button" (click)="showChatBox()">Show Chat Box</button>
+
+        <app-chat *ngIf="showChat"></app-chat>
+      </div>
+
+    </div>
+</div>
+
+

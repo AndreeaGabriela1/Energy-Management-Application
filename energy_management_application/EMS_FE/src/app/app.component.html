@@ -1,0 +1,21 @@
+<div class="bg">
+  <div class="body">
+    <!-- Toolbar -->
+    <div class="toolbar" role="banner">
+      <img 
+        width="80"
+        alt="Energy Management System Logo"
+        src="assets/energy_management_system_logo.jpg"
+        style="border-radius: 30%; margin-left: 5px; margin-right: 5px;"
+      />
+      <span style="font-size: 24px;">Energy Management System</span>
+        <div class="spacer"></div>
+          <button routerLink="login">
+            <i class="fas fa-sign-in-alt"></i> Login</button>
+          <app-logout></app-logout>
+        
+    </div>
+
+    <router-outlet></router-outlet>
+  </div>
+</div>
