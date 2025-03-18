@@ -4,6 +4,7 @@ Key Features:
 User Management – Full CRUD operations for users.
 Device Management – Full CRUD operations for devices and their association with users.
 Real-time Monitoring – Receives energy consumption data via RabbitMQ and sends notifications through WebSocket.
+Device Simulation applications - Reads energy data consumption for 2 devices and sends through RabbitMQ those informations to Monitoring microservice.
 Chat Microservice – Based on WebSocket, enabling real-time communication between users and administrators.
   Users can chat with each other.
   Administrators can chat with multiple users simultaneously.
